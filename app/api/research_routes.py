@@ -9,7 +9,7 @@ from database.db import get_db
 from database.models import User, ResearchSession
 from auth.dependencies import get_current_user
 from agent.graph import MultiAgentSystem
-from models import ResearchRequest, ResearchResponse, ResearchHistoryItem
+from api.models import ResearchRequest, ResearchResponse, ResearchHistoryItem
 router = APIRouter(prefix="/research", tags=["Research"])
 
 # Initialize agent system

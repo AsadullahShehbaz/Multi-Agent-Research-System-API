@@ -4,7 +4,7 @@ Router Module - Defines routing/decision logic
 Purpose: Separate routing logic for clarity and testing
 """
 
-from app.agent.state import MultiAgentState
+from agent.state import MultiAgentState
 from langchain_core.messages import AIMessage
 import logging
 
