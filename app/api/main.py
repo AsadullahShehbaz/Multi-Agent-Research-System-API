@@ -2,9 +2,9 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 import logging
-from database.db import init_db
-from api.auth_routes import router as auth_router
-from api.research_routes import router as research_router
+from app.database.db import init_db
+from app.api.auth_routes import router as auth_router
+from app.api.research_routes import router as research_router
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)

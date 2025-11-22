@@ -1,9 +1,9 @@
 from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from sqlalchemy.orm import Session
-from database.db import get_db
-from database.models import User
-from auth.security import decode_access_token
+from app.database.db import get_db
+from app.database.models import User
+from app.auth.security import decode_access_token
 
 # Security scheme for Swagger UI
 security = HTTPBearer()

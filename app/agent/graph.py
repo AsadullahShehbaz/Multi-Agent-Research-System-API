@@ -8,10 +8,10 @@ from langgraph.prebuilt import ToolNode
 from langchain_groq import ChatGroq
 
 # my project files 
-from agent.state import MultiAgentState
-from agent.tools import ResearchTools
-from agent.agents import ResearcherAgent,FactCheckerAgent,SummarizerAgent
-from agent.router import (
+from app.agent.state import MultiAgentState
+from app.agent.tools import ResearchTools
+from app.agent.agents import ResearcherAgent,FactCheckerAgent,SummarizerAgent
+from app.agent.router import (
     should_continue_research,
     should_continue_fact_checking,
     after_tools,
@@ -21,6 +21,8 @@ from agent.router import (
 
 import os 
 import logging
+from dotenv import load_dotenv
+load_dotenv()
 
 logger = logging.getLogger(__name__)
 

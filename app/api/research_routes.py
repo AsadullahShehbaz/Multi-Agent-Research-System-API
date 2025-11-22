@@ -5,11 +5,11 @@ from typing import List, Optional
 from datetime import datetime
 import time
 
-from database.db import get_db
-from database.models import User, ResearchSession
-from auth.dependencies import get_current_user
-from agent.graph import MultiAgentSystem
-from models import ResearchRequest, ResearchResponse, ResearchHistoryItem
+from app.database.db import get_db
+from app.database.models import User, ResearchSession
+from app.auth.dependencies import get_current_user
+from app.agent.graph import MultiAgentSystem
+from app.api.models import ResearchRequest, ResearchResponse, ResearchHistoryItem
 router = APIRouter(prefix="/research", tags=["Research"])
 
 # Initialize agent system

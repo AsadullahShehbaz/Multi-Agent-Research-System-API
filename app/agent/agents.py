@@ -4,7 +4,7 @@ Purpose: Separate agent logic for modularity and testing
 """
 
 from langchain_core.messages import HumanMessage,SystemMessage
-from agent.state import MultiAgentState
+from app.agent.state import MultiAgentState
 from typing import Dict 
 import logging 
 

@@ -4,6 +4,7 @@ pycache/
 *.pyd
 *.pkl
 *.sqlite3
+venv 
 *.db
 *.so
 *.dylib
