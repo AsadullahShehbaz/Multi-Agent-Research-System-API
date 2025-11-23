@@ -1,11 +1,10 @@
 from passlib.context import CryptContext
-from jose import JWTError
-import jwt 
+from jose import JWTError,jwt
 from datetime import datetime, timedelta
 import os
 
 # Password hashing
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+pwd_context = CryptContext(schemes=["argon2"], deprecated="auto")
 
 # JWT settings
 SECRET_KEY = os.getenv("SECRET_KEY", "your-secret-key-change-in-production")
@@ -14,6 +13,7 @@ ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24  # 24 hours
 
 def hash_password(password: str) -> str:
     """Hash a plain password"""
+    truncated_password = password[:72] 
     return pwd_context.hash(password)
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
