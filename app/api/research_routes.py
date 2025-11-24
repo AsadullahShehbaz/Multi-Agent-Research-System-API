@@ -5,16 +5,12 @@ from typing import List, Optional
 from datetime import datetime
 import time
 
-from database.db import get_db
-from database.models import User, ResearchSession
-from auth.dependencies import get_current_user
-from agent.graph import MultiAgentSystem
-from api.models import ResearchRequest, ResearchResponse, ResearchHistoryItem
+from app.database.db import get_db
+from app.database.models import User, ResearchSession
+from app.auth.dependencies import get_current_user
+from app.agent.graph import research
+from app.api.models import ResearchRequest, ResearchResponse, ResearchHistoryItem
 router = APIRouter(prefix="/research", tags=["Research"])
-
-# Initialize agent system
-agent_system = MultiAgentSystem()
-
 
 @router.post("/", response_model=ResearchResponse)
 def create_research(
@@ -45,7 +41,7 @@ def create_research(
     try:
         # Run multi-agent research
         start_time = time.time()
-        result = agent_system.research(request.query)
+        result = research(request.query)
         processing_time = int(time.time() - start_time)
         
         # Update session with results
@@ -54,7 +50,7 @@ def create_research(
         research_session.final_report = result["final_report"]
         research_session.status = "completed"
         research_session.processing_time = processing_time
-        research_session.completed_at = datetime.utcnow()
+        research_session.completed_at = datetime.now()
         
         db.commit()
         db.refresh(research_session)

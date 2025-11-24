@@ -1,6 +1,6 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, Session
-from database.models import Base
+from app.database.models import Base
 import os
 
 # Database URL (SQLite file)

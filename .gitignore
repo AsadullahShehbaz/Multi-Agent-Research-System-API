@@ -1,0 +1,5 @@
+.env
+*.db
+agent.ipynb
+__pycache__
+

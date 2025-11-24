@@ -5,6 +5,21 @@ from typing import List
 import logging 
 
 logger = logging.getLogger(__name__)
+# ===== TOOLS =====
+@tool
+def web_search(query: str) -> str:
+    """
+    Search the web for current information about a topic.
+    
+    Args:
+        query: The search query string
+    """
+    search = DuckDuckGoSearchRun(region="us-en")
+    result = search.invoke(query)
+    print(f"\n📡 Search Result Preview: {result[:200]}...\n")
+    return result
+
+my_tools = [web_search]
 
 class ResearchTools():
     """
@@ -34,7 +49,7 @@ class ResearchTools():
         """
         try:
             logger.info(f"Web Search : {query}")
-            results =  self.search_engine.run(query)
+            results =  self.search_engine.invoke(query)
             return f"Search Results : \n{results}"
         except Exception as e:
             logger.error(f"Search error : {e}")

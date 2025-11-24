@@ -4,186 +4,164 @@ Purpose: Separate agent logic for modularity and testing
 """
 
 from langchain_core.messages import HumanMessage,SystemMessage
-from agent.state import MultiAgentState
+from app.agent.state import MultiAgentState
 from typing import Dict 
-import logging 
 
-logger = logging.getLogger(__name__)
 
-class ResearcherAgent():
-    """
-    Researcher Agent - Gathers information using tools
+# ===== AGENTS =====
+
+class ResearcherAgent:
+    """Researcher agent that conducts initial research"""
     
-    Responsibilities:
-    - Search web for current information
-    - Use multiple tools to gather data
-    - Provide comprehensive research findings
-    """
-    def __init__(self,llm_with_tools):
-        self.llm = llm_with_tools
+    def __init__(self, llm, tools):
+        self.llm = llm
+        self.llm_with_tools = llm.bind_tools(tools)
         self.name = "Researcher"
-
-    def run(self,state:MultiAgentState)->Dict:
-        """
-        Execute research workflow
+    
+    def __call__(self, state: MultiAgentState):
+        """Execute researcher agent"""
+        iteration = state.get("iteration", 0)
+        query = state.get("query", "")
+        messages = state.get("messages", [])
         
-        Args:
-            state: Current workflow state
-            
-        Returns:
-            Updated state with research results
-        """
-        query = state["query"]
-        iteration = state["iteration",0]
+        print(f"🔬 Researcher: Starting iteration {iteration + 1} for '{query}'")
+        
+        # Check if we have previous research
+        tool_messages = [msg for msg in messages if isinstance(msg, ToolMessage)]
+        has_results = len(tool_messages) > 0
+        
+        if not has_results:
+            instruction = "Use the web_search tool NOW to find information. Make your first search."
+        else:
+            instruction = "Review the search results. Either search for more details OR provide a summary of findings."
+        
+        system_msg = SystemMessage(content=f"""You are a research assistant.
 
-        system_prompt = f"""You are a RESEARCHER agent with web search tools.
+Query: "{query}"
 
-        Your Job: Find CURRENT, FACTUAL information about: {query}
+{instruction}
 
-        Available Tools:
-        - web_search: Search internet for recent information
-        - web_scrape: Read full content from URLs
-        - calculate: Perform numerical calculations
-
-        Strategy:
-        1. Start with broad web search
-        2. Search for specific aspects
-        3. Look for recent developments (2025-2026)
-        4. Cite sources clearly
-
-        Iteration: {iteration + 1}"""
-
-        logger.info(f"{self.name}: Starting research iteration {iteration+1}")
-        messages = [
-            SystemMessage(content=system_prompt),
-            HumanMessage(content=f"Research thoroughly: {query}")
-        ]
-
-        response = self.llm.invoke(messages)
-
+Current iteration: {iteration + 1}
+""")
+        
+        conversation = [system_msg] + messages
+        response = self.llm_with_tools.invoke(conversation)
+        
+        print(f"✅ Researcher: Completed iteration {iteration + 1}")
+        if hasattr(response, "tool_calls") and response.tool_calls:
+            print(f"   📞 Making {len(response.tool_calls)} tool call(s)")
+        
         return {
-            "messages":[response],
-            "iteration":iteration+1
+            "messages": [response],
+            "iteration": iteration + 1
         }
-    
 
-class FactCheckerAgent():
-    """
-    Fact-Checker Agent - Verifies information
+
+
+
+class FactCheckerAgent:
+    """Fact-checker agent that verifies research"""
     
-    Responsibilities:
-    - Verify claims from research
-    - Cross-check with multiple sources
-    - Rate confidence levels
-    """
-    def __init__(self,llm_with_tools):
-        self.llm = llm_with_tools
+    def __init__(self, llm, tools):
+        self.llm = llm
+        self.llm_with_tools = llm.bind_tools(tools)
         self.name = "Fact-Checker"
-    def run(self,state:MultiAgentState)->Dict:
-        """
-        Execute fact-checking workflow
+    
+    def __call__(self, state: MultiAgentState):
+        """Execute fact-checker agent"""
+        research_data = state.get("research_data", "")
+        query = state.get("query", "")
+        fact_check_iteration = state.get("fact_check_iteration", 0)
+        max_fact_check = state.get("max_fact_check_iterations", 1)
         
-        Args:
-            state: Current workflow state
-            
-        Returns:
-            Updated state with verified facts
-        """
-        research_data = state["research_data",""]
-        system_prompt = """You are a FACT-CHECKER agent with verification tools.
+        print(f"🔍 Fact-Checker: Iteration {fact_check_iteration + 1}/{max_fact_check}")
+        print(f"   Research data: {len(research_data)} chars")
+        
+        # Use research_data directly, or extract from messages if empty
+        if not research_data or len(research_data) < 50:
+            tool_contents = [
+                msg.content for msg in state.get("messages", [])
+                if isinstance(msg, ToolMessage)
+            ]
+            if tool_contents:
+                research_data = "\n\n".join(tool_contents[-3:])  # Last 3 tool results
+                print(f"   ⚠️  Using last 3 tool results: {len(research_data)} chars")
+        
+        # CRITICAL: Restrictive prompt to avoid excessive tool use
+        system_msg = SystemMessage(content=f"""You are a fact-checking assistant.
 
-        Your Job: Verify claims and assess reliability.
+Query: "{query}"
 
-        Tools Available:
-        - web_search: Cross-check facts
-        - calculate: Verify numerical claims
+Research findings (excerpt):
+{research_data[:2000]}...
 
-        Process:
-        1. Review all claims
-        2. Use tools to verify questionable claims
-        3. Rate confidence (High/Medium/Low)
-        4. Flag unverified claims
+Instructions:
+1. Identify 3-5 key claims from the research
+2. Assess their credibility
+3. ONLY use web_search if you find a SUSPICIOUS or DOUBTFUL claim
+4. DO NOT search for general verification - trust reputable sources
+5. Provide a brief fact-check summary
 
-        Output Format:
-        ✅ VERIFIED: [fact] - Source: [source] (Confidence: High)
-        ⚠️ NEEDS VERIFICATION: [claim] - Reason: [reason]
-        🚫 REFUTED: [false claim] - Reason: [why]"""
+Iteration: {fact_check_iteration + 1}/{max_fact_check}
 
-        logger.info(f"{self.name}: Verifying Facts")
-
-        messages = [
-            SystemMessage(content=system_prompt),
-            HumanMessage(content=f"Verify: \n\n{research_data}")
-        ]
-        response = self.llm.invoke(messages)
-
+Be efficient - avoid unnecessary searches.""")
+        
+        # Only use recent messages to avoid context bloat
+        messages = [system_msg] + state.get("messages", [])[-8:]
+        response = self.llm_with_tools.invoke(messages)
+        
+        print("✅ Fact-Checker: Verification complete")
+        if hasattr(response, "tool_calls") and response.tool_calls:
+            print(f"   📞 Making {len(response.tool_calls)} verification call(s)")
+        
         return {
-            "messages":[response],
+            "messages": [response],
+            "fact_check_iteration": fact_check_iteration + 1
         }
+
+
+class SummarizerAgent:
+    """Summarizer agent that creates final report"""
     
-class SummarizerAgent():
-    """
-    Summarizer Agent - Creates final report
-    
-    Responsibilities:
-    - Combine research and verified facts
-    - Create structured report
-    - Format in markdown
-    """
-    def __init__(self,llm):
+    def __init__(self, llm):
         self.llm = llm
         self.name = "Summarizer"
-
-    def run(self,state:MultiAgentState)->Dict:
-        """
-        Execute summarization workflow
+    
+    def __call__(self, state: MultiAgentState):
+        """Execute summarizer agent"""
+        query = state.get("query", "")
+        research_data = state.get("research_data", "")
+        verified_facts = state.get("verified_facts", "")
         
-        Args:
-            state: Current workflow state
-            
-        Returns:
-            Updated state with final report
-        """
-        query = state["query"]
-        research = state["research_data",""]
-        verified = state["verified_facts",""]
+        print(f"📝 Summarizer: Creating final report")
+        print(f"   Research: {len(research_data)} chars")
+        print(f"   Verified: {len(verified_facts)} chars")
+        
+        system_msg = SystemMessage(content=f"""Create a comprehensive report for: "{query}"
 
-        system_prompt = """You are a SUMMARIZER agent.
+Research Data:
+{research_data}
 
-Your Job: Create a professional research report.
+Verified Facts:
+{verified_facts}
 
-Structure:
-# Research Report: [Topic]
+Instructions:
+1. Write an executive summary
+2. Present key findings
+3. Note any uncertainties
+4. Make it clear and professional
 
-## 🎯 Executive Summary
-[2-3 sentences]
-
-## 🔍 Key Findings
-[Main points with sources]
-
-## 📊 Detailed Analysis
-[Comprehensive explanation]
-
-## 💡 Insights
-[Implications and outlook]
-
-## 📚 Sources
-[All sources used]"""
-
-        logger.info(f"{self.name}: Creating final report")
-        messages = [
-            SystemMessage(content=system_prompt),
-            HumanMessage(content=f"""Report for: {query}
-
-            Research:
-            {research}
-
-            Verified:
-            {verified}"""
-            )]
-                
-        response = self.llm.invoke(messages)
+Use markdown formatting.""")
+        
+        response = self.llm.invoke([system_msg])
+        
+        print("✅ Report complete!")
+        
         return {
-            "messages":[response],
-            "final_report":response.content
+            "messages": [response],
+            "final_report": response.content
         }
+
+
+    
+

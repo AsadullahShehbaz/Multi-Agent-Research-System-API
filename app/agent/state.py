@@ -8,18 +8,7 @@ from langchain_core.messages import BaseMessage
 from langgraph.graph import add_messages 
 
 class MultiAgentState(TypedDict):
-    """
-    Shared state between all agents in the workflow
-    
-    Attributes:
-        messages: All conversation messages (including tool calls)
-        query: Original research 
-        research_data: Raw data collected by researcher
-        verified_facts: Facts verified by fact-checker
-        final_report: Final report from summarizer
-        iteration: Current iteration count
-        max_iterations: Maximum allowed iterations
-    """
+    """State for the multi-agent research system"""
 
     messages : Annotated[List[BaseMessage],add_messages]
     query : str
@@ -28,5 +17,7 @@ class MultiAgentState(TypedDict):
     final_report : str
     iteration : int
     max_iterations : int 
+    fact_check_iteration : int
+    fact_check_max_iterations : int
 
     

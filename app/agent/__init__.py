@@ -1,4 +1,4 @@
 """Agent module initialization"""
-from agent.graph import MultiAgentSystem
+from app.agent.graph import research
 
-__all__ = ['MultiAgentSystem']
+__all__ = ['research']
