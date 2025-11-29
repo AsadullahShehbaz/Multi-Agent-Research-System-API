@@ -53,7 +53,7 @@ class ResearchRequest(BaseModel):
     class Config:
         json_schema_extra = {
             "example": {
-                "query": "Latest AI developments 2024",
+                "query": "Latest AI developments at End of 2025",
                 "max_iterations": 2
             }
         }
@@ -66,7 +66,7 @@ class ResearchResponse(BaseModel):
     final_report: str
     status: str
     processing_time: Optional[int]
-    iterations: Optional[int]
+    iterations: Optional[int] = None
     created_at: str
 
 

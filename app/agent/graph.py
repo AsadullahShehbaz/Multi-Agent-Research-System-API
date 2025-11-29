@@ -9,7 +9,6 @@ from langchain_groq import ChatGroq
 
 # my project files 
 from app.agent.state import MultiAgentState
-from app.agent.tools import ResearchTools
 from app.agent.agents import ResearcherAgent,FactCheckerAgent,SummarizerAgent
 from app.agent.router import (
     should_continue_research,
@@ -85,7 +84,7 @@ agent = workflow.compile()
 
 # ===== EXECUTE =====
 
-def research(query: str):
+def research(query: str,max_iterations: int =2):
     initial_state = {
         "messages": [],
         "query": query,
@@ -93,7 +92,7 @@ def research(query: str):
         "verified_facts": "",
         "final_report": "",
         "iteration": 0,
-        "max_iterations": 2,
+        "max_iterations": max_iterations,
         "fact_check_iteration": 0,  # CRITICAL
         "max_fact_check_iterations": 1  # CRITICAL: Limit to 1 iteration
     }
@@ -109,3 +108,9 @@ def research(query: str):
     print("="*80)
     print(result.get("final_report", "No report generated"))
     return result
+
+# ===== TEST =====
+
+if __name__ == "__main__":    
+    result = research("Python with AI in 2025")
+    print(result)

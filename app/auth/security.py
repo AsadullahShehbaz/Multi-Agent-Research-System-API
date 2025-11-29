@@ -1,11 +1,10 @@
 from passlib.context import CryptContext
-from jose import JWTError
-import jwt 
+from jose import JWTError,jwt
 from datetime import datetime, timedelta
 import os
 
 # Password hashing
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+pwd_context = CryptContext(schemes=["argon2"], deprecated="auto")
 
 # JWT settings
 SECRET_KEY = os.getenv("SECRET_KEY", "your-secret-key-change-in-production")

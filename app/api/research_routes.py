@@ -41,13 +41,14 @@ def create_research(
     try:
         # Run multi-agent research
         start_time = time.time()
-        result = research(request.query)
+        result = research(query=request.query, max_iterations=request.max_iterations)
         processing_time = int(time.time() - start_time)
         
         # Update session with results
         research_session.research_data = result["research_data"]
         research_session.verified_facts = result["verified_facts"]
         research_session.final_report = result["final_report"]
+        research_session.agent_iterations = result.get("iteration", 0)
         research_session.status = "completed"
         research_session.processing_time = processing_time
         research_session.completed_at = datetime.now()
@@ -61,6 +62,7 @@ def create_research(
             "research_data": research_session.research_data,
             "verified_facts": research_session.verified_facts,
             "final_report": research_session.final_report,
+            "iterations": research_session.agent_iterations,
             "status": research_session.status,
             "processing_time": research_session.processing_time,
             "created_at": str(research_session.created_at)

@@ -5,7 +5,7 @@ Purpose: Separate routing logic for clarity and testing
 """
 
 from app.agent.state import MultiAgentState
-from langchain_core.messages import AIMessage
+from langchain_core.messages import AIMessage,ToolMessage
 
 # ===== ROUTING FUNCTIONS =====
 
@@ -76,12 +76,42 @@ def after_tools(state: MultiAgentState) -> str:
 # ===== HELPER FUNCTIONS =====
 
 def extract_agent_output(state: MultiAgentState, agent_name: str) -> str:
-    """Extract output from specific agent"""
+    """
+    Extract output from specific agent with multiple fallback strategies
+    """
     messages = state.get("messages", [])
+    
+    # Strategy 1: Look for AIMessage with substantial text content
     for message in reversed(messages):
         if isinstance(message, AIMessage):
-            if isinstance(message.content, str) and len(message.content) > 50:
-                return message.content
+            content = message.content
+            # Handle both string and list content formats
+            if isinstance(content, str) and len(content) > 50:
+                return content
+            elif isinstance(content, list):
+                # Content might be a list of dicts with 'text' keys
+                text_parts = [
+                    item.get('text', '') if isinstance(item, dict) else str(item)
+                    for item in content
+                ]
+                combined = '\n'.join(text_parts)
+                if len(combined) > 50:
+                    return combined
+    
+    # Strategy 2: If no substantial AIMessage, collect recent ToolMessages
+    tool_contents = []
+    for message in reversed(messages):
+        if isinstance(message, ToolMessage):
+            tool_contents.append(message.content)
+        # Stop after collecting 3 tool results
+        if len(tool_contents) >= 3:
+            break
+    
+    if tool_contents:
+        combined = "\n\n---\n\n".join(reversed(tool_contents))
+        return combined
+    
+    # Strategy 3: Last resort - return empty string
     return ""
 
 

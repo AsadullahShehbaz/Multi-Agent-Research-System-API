@@ -1,5 +1,5 @@
 """Database module initialization"""
-from app.database.db import get_db, init_db
-from app.database.models import User, ResearchSession
+# from db import get_db, init_db
+# from models import User, ResearchSession
 
-__all__ = ['get_db', 'init_db', 'User', 'ResearchSession']
+# __all__ = ['get_db', 'init_db', 'User', 'ResearchSession']

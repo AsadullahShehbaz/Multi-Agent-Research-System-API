@@ -3,7 +3,7 @@ Agents Module - Defines all agent classes
 Purpose: Separate agent logic for modularity and testing
 """
 
-from langchain_core.messages import HumanMessage,SystemMessage
+from langchain_core.messages import HumanMessage,SystemMessage,ToolMessage
 from app.agent.state import MultiAgentState
 from typing import Dict 
 

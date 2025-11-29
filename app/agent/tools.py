@@ -3,6 +3,8 @@ from langchain_community.tools import DuckDuckGoSearchRun
 from langchain_community.document_loaders import WebBaseLoader
 from typing import List 
 import logging 
+import time
+from typing import Optional
 
 logger = logging.getLogger(__name__)
 # ===== TOOLS =====
@@ -19,7 +21,23 @@ def web_search(query: str) -> str:
     print(f"\n📡 Search Result Preview: {result[:200]}...\n")
     return result
 
-my_tools = [web_search]
+from langchain.tools import tool
+from langchain_google_community import GoogleSearchAPIWrapper
+from dotenv import load_dotenv
+load_dotenv()
+search = GoogleSearchAPIWrapper()
+
+@tool
+def google_search(query: str) -> str:
+    """
+    Search the web for current information about a topic.
+    
+    Args:
+        query: The search query string
+    """
+    return search.run(query)
+
+my_tools = [google_search]
 
 class ResearchTools():
     """
