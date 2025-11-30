@@ -6,8 +6,8 @@ python-multipart==0.0.20
 # Database
 SQLAlchemy==2.0.41
 alembic==1.17.1
-argon2-cffi=25.1.0
-argon2-cffi-bindings=
+argon2-cffi==25.1.0
+argon2-cffi-bindings
 
 # Authentication
 python-jose[cryptography]==3.5.0
