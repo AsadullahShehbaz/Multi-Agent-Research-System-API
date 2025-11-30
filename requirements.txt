@@ -1,35 +1,36 @@
 # Core FastAPI
-fastapi==0.109.0
-uvicorn[standard]==0.27.0
-python-multipart==0.0.6
+fastapi==0.121.0
+uvicorn[standard]==0.38.0
+python-multipart==0.0.20
 
 # Database
-sqlalchemy==2.0.25
-alembic==1.13.1
+SQLAlchemy==2.0.41
+alembic==1.17.1
+argon2-cffi=25.1.0
+argon2-cffi-bindings=
 
 # Authentication
-python-jose[cryptography]==3.3.0
+python-jose[cryptography]==3.5.0
 passlib[bcrypt]==1.7.4
-bcrypt==4.1.2
+bcrypt==5.0.0
 
 # LangChain & AI
-langchain==0.1.0
-langgraph==0.0.20
-langchain-groq
-langchain-community==0.0.13
+langchain==1.0.3
+langgraph==1.0.3
+langchain-groq==1.0.1
+langchain-community==0.4.1
 
 # Validation
-pydantic==2.5.0
-pydantic[email]==2.5.0
-email-validator==2.1.0
+pydantic==2.11.7
+email-validator==2.3.0
 
 # Environment
-python-dotenv==1.0.0
+python-dotenv==1.1.1
 
 # Tools
-duckduckgo-search==4.1.0
-requests==2.31.0
+duckduckgo-search==8.1.1
+requests==2.32.5
 
 # Testing
-pytest==7.4.3
-httpx==0.26.0
+pytest==9.0.1
+httpx==0.28.1
