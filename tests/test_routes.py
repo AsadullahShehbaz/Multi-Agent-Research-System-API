@@ -7,7 +7,7 @@ from app.database.db import Base, get_db, DATABASE_URL
 
 # --- Test Database Setup ---
 # Use a separate SQLite DB for tests
-TEST_DATABASE_URL = "sqlite:///./data/test_research_assistant.db"
+TEST_DATABASE_URL = "sqlite:///./test_research_assistant.db"
 
 engine = create_engine(
     TEST_DATABASE_URL,
