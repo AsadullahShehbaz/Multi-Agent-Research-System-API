@@ -1,11 +1,12 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
-import logging
 from app.database.db import init_db
 from app.api.auth_routes import router as auth_router
 from app.api.research_routes import router as research_router
-
+import warnings
+import logging
+warnings.filterwarnings("ignore", category=DeprecationWarning, module="passlib")
 # Configure logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)

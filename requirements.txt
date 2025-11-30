@@ -13,6 +13,7 @@ argon2-cffi-bindings=
 python-jose[cryptography]==3.5.0
 passlib[bcrypt]==1.7.4
 bcrypt==5.0.0
+argon2-cffi = 25.1.0
 
 # LangChain & AI
 langchain==1.0.3

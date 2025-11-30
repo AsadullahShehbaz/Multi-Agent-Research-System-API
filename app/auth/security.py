@@ -1,10 +1,10 @@
-from passlib.context import CryptContext
+from argon2 import PasswordHasher
 from jose import JWTError,jwt
 from datetime import datetime, timedelta
 import os
 
 # Password hashing
-pwd_context = CryptContext(schemes=["argon2"], deprecated="auto")
+pwd_context = PasswordHasher()
 
 # JWT settings
 SECRET_KEY = os.getenv("SECRET_KEY", "your-secret-key-change-in-production")
@@ -17,7 +17,7 @@ def hash_password(password: str) -> str:
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
     """Verify password against hash"""
-    return pwd_context.verify(plain_password, hashed_password)
+    return pwd_context.verify(hashed_password, plain_password)
 
 def create_access_token(data: dict, expires_delta: timedelta = None):
     """Create JWT access token"""

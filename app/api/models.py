@@ -2,7 +2,7 @@
 API Models - Pydantic request/response models
 """
 
-from pydantic import BaseModel, Field, EmailStr
+from pydantic import BaseModel, ConfigDict, Field, EmailStr
 from typing import Optional
 
 
@@ -12,14 +12,15 @@ class UserRegister(BaseModel):
     email: EmailStr
     password: str
     
-    class Config:
-        json_schema_extra = {
+    model_config =  ConfigDict(
+        json_schema_extra={
             "example": {
                 "username": "john_doe",
                 "email": "john@example.com",
                 "password": "strongpassword123"
             }
         }
+    )
 
 
 class UserLogin(BaseModel):
@@ -50,13 +51,14 @@ class ResearchRequest(BaseModel):
     query: str = Field(..., min_length=5, description="Research question")
     max_iterations: Optional[int] = Field(2, ge=1, le=5)
     
-    class Config:
-        json_schema_extra = {
+    model_config = ConfigDict(
+        json_schema_extra={
             "example": {
                 "query": "Latest AI developments at End of 2025",
                 "max_iterations": 2
             }
         }
+    )
 
 
 class ResearchResponse(BaseModel):
@@ -82,4 +84,3 @@ class HealthResponse(BaseModel):
     """Health check response"""
     status: str
     version: str
-
