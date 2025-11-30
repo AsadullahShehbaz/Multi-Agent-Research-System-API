@@ -3,6 +3,7 @@ from sqlalchemy.orm import sessionmaker, Session
 from app.database.models import Base
 import os
 
+
 # Database URL (SQLite file)
 DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./research_assistant.db")
 
