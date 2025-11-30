@@ -3,7 +3,6 @@
 AI-powered research system with modular architecture, multi-agent collaboration, and real tool integration.
 
 ## 🌟 Features
-
 - **Multi-Agent System**: 3 specialized AI agents working together
   - **Researcher**: Searches web for current information
   - **Fact-Checker**: Verifies claims and cross-checks sources
